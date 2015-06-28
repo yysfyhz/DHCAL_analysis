@@ -1,2 +1,2 @@
 DHCAL_analysis
-This is the analysis codes of DHCAL program and is working on git.
+This the analysis program of DHCAL which works on git.
