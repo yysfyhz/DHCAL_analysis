@@ -63,7 +63,7 @@ class Event {
 	//Maximum Z layer reached by the event
 	int maxZ;
 
-	//Timebin with the most hits for an event 
+	//Timebin with the most hits for an event
 	int t0;
 	//Contains the timing information for an event
 
@@ -95,12 +95,12 @@ class Event {
 	float meanl;
 	//Number of active layers
 	int nactivelayer;
-	//calibrated Hitssum　
+	//calibrated Hitssum
 	double hitssum;
 	//Calibrated hits using weights
 	double weightcalhits;
 	vector<double> sum;
-	//Boolean saying if Event showered and the layer it started　
+	//Boolean saying if Event showered and the layer it started
 	bool didshower;
 	int showerstart;
 	//Defines type
@@ -151,8 +151,8 @@ class Event {
 	//Mutators
 	void setNumPoints(int);
 	void setMaxChannelZ(int);
-	int checkDoubleHits(vector<char>&,vector<char>&,vector<char>&,vector<int>&,vector<float>&, vector<int>&, vector<int>&,vector<int>&, int&);
-	int checkTimingHits(vector<char>&,vector<char>&,vector<char>&,vector<int>&,vector<float>&, vector<int>&,vector<int>&, vector<int>&, int&);
+	int checkDoubleHits(vector<char>&,vector<char>&,vector<char>&,vector<int>&,vector<float>&, vector<int>&, vector<int>&,vector<int>&, int&);//Check if the same Position fired twice during an Event and erase the information of the event
+	int checkTimingHits(vector<char>&,vector<char>&,vector<char>&,vector<int>&,vector<float>&, vector<int>&,vector<int>&, vector<int>&, int&);//Remove hits with wrong Timing 
 	void removeDeadAsics(vector<char>&, vector<char>&, vector<char>&,vector<int>&,vector<int>&,vector<int>&, int&, vector<int>&, vector<int>&, vector<int>&, vector<double>&);
 	bool checkMultiple(vector<char>& X, vector<char>& Y, vector<char>& Z);
 
@@ -312,7 +312,7 @@ int find_maximumChannels(std::string filename, int *maxX, int *maxY, int *maxZ, 
 	std::fstream file;
 	file.open(filename.c_str(), std::ios::in);
 	if(!file.is_open()){
-		cout<<"error opening the file"<<endl;
+		cout<<"Error opening the file:"<<filename.c_str() << endl;
 		return 0;
 	}
 
@@ -373,7 +373,7 @@ void Run::process(std::string filename, bool discardDouble, bool discardTiming, 
 	}
 
 	chdir(currentDirectoryStr.c_str());
-	cout << "~Making directory " << currentDirectoryStr<<"/";
+	cout << "~Making directory " << currentDirectoryStr<<"/"<<endl;
 
 
 	//Find the dimensions of the detector for this run	
@@ -410,7 +410,7 @@ void Run::process(std::string filename, bool discardDouble, bool discardTiming, 
 	std::fstream file;
 	file.open(filename.c_str(), std::ios::in);
 	if(!file.is_open()){
-		cout << "Error opening file"<<endl;
+		cout << "Error opening file:"<< filename.c_str()<< endl;
 		return;
 	}
 
@@ -529,7 +529,7 @@ void Run::process(std::string filename, bool discardDouble, bool discardTiming, 
 							}
 						}
 					}
-					timeVector[T[i]/100000]++;
+					timeVector[T[i]/100000]++; //?
 					(timeZVector[(int) Z[i]])[T[i]/100000]++;
 				}
 				if (discardDouble){
@@ -605,7 +605,7 @@ void Run::process(std::string filename, bool discardDouble, bool discardTiming, 
 				if(discardActive &&!discarded){
 					if (listOfEvents.back()->getNActiveLayer()<5) {
 						delete listOfEvents.back();
-						listOfEvents.pop_back();
+						listOfEvents.pop_back(); //erase the last element of the vector
 						noActive++;
 						discarded=true;
 					}
@@ -1587,8 +1587,9 @@ void plotDensity(list<Event*> &listOfEvents, string period, string runName, int 
 	hDensityp->Draw();
 
 	//Save the file
+             chdir("/home/inpactest/Yusen/dhcal_TB");
 	canv->SaveAs(fileName.c_str());
-
+       
 	delete hDensity;
 	delete hDensitym;
 	delete hDensitypi;
@@ -1642,6 +1643,7 @@ void plotDensity(list<Event*> &listOfEvents, string period, string runName, int 
 	hDensitypi3D->Draw();
 
 	//Save the file
+	chdir("/home/inpactest/Yusen/dhcal_TB");
 	canv3D->SaveAs(fileName3D.c_str());
 
 
@@ -1755,7 +1757,7 @@ int main()
 					runName = std::string("run")+currentLine;
 					std::stringstream fileNStream;
 					if (month!="MC"){
-						fileNStream << "/users/detector/bfreund/private/Nov2011/" << month << "/" << runName<<".beam.txt";
+						fileNStream << "/home/inpactest/Yusen/dhcal_TB/ascii/" << month << "/" <<"ascii/"<< runName<<".beam.txt";
 					}
 
 					fileName = fileNStream.str();
