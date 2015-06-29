@@ -394,7 +394,7 @@ void Run::process(std::string filename, bool discardDouble, bool discardTiming, 
 	vector<float> calibtop;
 
 	if (calibrate){
-		chdir("/users/detector/bfreund/private/Analysis/New/Calibration/");
+		chdir("/users/detector/bfreund/private/Analysis/New/Calibration/"); // 实际上还在当前目录
 		readcalibration(runNo, energy, calibbottom, calibmiddle, calibtop, eff, mult);
 		calibbottom.push_back(1);
 		calibmiddle.push_back(1);
@@ -499,14 +499,14 @@ void Run::process(std::string filename, bool discardDouble, bool discardTiming, 
 		file >> zpos;
 		totalNoHits++;
 
-		//If this is the first time stamp...
+		//If this is the first time stamp... //标记
 		if (noEvents==0 && totalNoHits<2){
 			initTime=tim;
 		}
 
 		//If we have a new event starting here, it is time to save the points
 		//in X, Y, Z to an event and process it
-		if (xpos == -1){
+		if (xpos == -1){  //xpos=-1的时间是作为ttigger使用的
 			ttrigger=tim;
 			Ckovtemp=ypos;
 
@@ -516,7 +516,7 @@ void Run::process(std::string filename, bool discardDouble, bool discardTiming, 
 				listOfEvents.push_back(new Event(T,DeltaT, noPoints));
 				bool discarded=false;
 				//Process time stamps
-				counter = listOfEvents.back()->processTime(initTime, counter, &maxT, &last);
+				counter = listOfEvents.back()->processTime(initTime, counter, &maxT, &last);//返回计数器计数次数counter（由于计数时间有上限，必须有循环）
 				//Store the time information in the timeVector
 				for (int i=0; i<T.size(); i++){
 					int sizeBefore = timeVector.size();
@@ -533,7 +533,7 @@ void Run::process(std::string filename, bool discardDouble, bool discardTiming, 
 					(timeZVector[(int) Z[i]])[T[i]/100000]++;
 				}
 				if (discardDouble){
-					listOfEvents.back()->checkDoubleHits(X, Y, Z, T, calibH, DeltaT, Density, Density3D, noDoubleHits);
+					listOfEvents.back()->checkDoubleHits(X, Y, Z, T, calibH, DeltaT, Density, Density3D, noDoubleHits);　//Check if the same Position fired twice during an Event; 
 				}
 				if (discardTiming){
 					listOfEvents.back()->checkTimingHits(X, Y, Z, T, calibH, DeltaT, Density, Density3D, noTimingHits);
@@ -1253,12 +1253,12 @@ void Event::computeEventNo(int EventNo){
 }
 
 
-//Check if the same Position fired twice during an Event; 
+//Check if the same Position fired twice during an Event;  wrong!
 int Event::checkDoubleHits(vector<char>& X, vector<char>& Y, vector<char>& Z, vector<int>& T,vector<float>& calibH,vector<int>& DeltaT, vector<int>& Density, vector<int>& Density3D, int& noDoubleHits){
- 	for (unsigned i=0; i<X.size() ; i++) {
+ 	for (unsigned i=0; i<X.size() ; i++) { //unsigned 无符号字符类型　
 		for (unsigned j=i+1; j<X.size(); j++) {	
 			if (X[i]==X[j] && Y[i]==Y[j] && Z[i]==Z[j]) {				
-				X.erase(X.begin() + j);
+				X.erase(X.begin() + j);//删除1+j位置　即X[j]
 				Y.erase(Y.begin() + j);
 				Z.erase(Z.begin() + j);
 				T.erase(T.begin() + j);
@@ -1266,7 +1266,8 @@ int Event::checkDoubleHits(vector<char>& X, vector<char>& Y, vector<char>& Z, ve
 				DeltaT.erase(DeltaT.begin() + j);
 				Density.erase(Density.begin()+j);
 				Density3D.erase(Density3D.begin()+j);
-				noDoubleHits++;					
+				noDoubleHits++;
+				//j--;					
 			}
 		}
 	}
@@ -1274,6 +1275,7 @@ int Event::checkDoubleHits(vector<char>& X, vector<char>& Y, vector<char>& Z, ve
 	return 0;
 
 }
+
 //Check for multiple particles
 bool Event::checkMultiple(vector<char>& X, vector<char>& Y, vector<char>& Z){
 	int xtemp[5]={0};
@@ -1360,7 +1362,7 @@ void readcalibration(string runNo, int energy, vector<float> &calibbottom, vecto
 	while (file >> currentLine)
 	{
 
-		if (currentLine == runNo){
+		if (currentLine == runNo){　//btm means bottom or middle or top
 			file >> layer;
 			file >> bmt;
 		//cout <<"bmt"<<bmt<<endl;
@@ -1658,7 +1660,7 @@ int main()
 
 		//Get the path of the current directory
 	char currentDirectory[200];
-	getcwd(currentDirectory, sizeof(currentDirectory));
+	getcwd(currentDirectory, sizeof(currentDirectory));//获取当前工作目录
 	std::string currentDirectoryStr(currentDirectory);
 
 	std::string month="Nov2011";
