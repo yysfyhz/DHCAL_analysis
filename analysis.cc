@@ -1267,7 +1267,7 @@ int Event::checkDoubleHits(vector<char>& X, vector<char>& Y, vector<char>& Z, ve
 				Density.erase(Density.begin()+j);
 				Density3D.erase(Density3D.begin()+j);
 				noDoubleHits++;
-				//j--;					
+				j--;					
 			}
 		}
 	}
